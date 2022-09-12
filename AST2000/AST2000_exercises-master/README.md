@@ -1,0 +1,1 @@
+data for AST2000-oppgaver

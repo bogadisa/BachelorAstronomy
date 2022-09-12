@@ -1,0 +1,17 @@
+[c1-8:2217167] *** An error occurred in MPI_Gatherv
+[c1-8:2217167] *** reported by process [272564224,0]
+[c1-8:2217167] *** on communicator MPI_COMM_WORLD
+[c1-8:2217167] *** MPI_ERR_TRUNCATE: message truncated
+[c1-8:2217167] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[c1-8:2217167] ***    and potentially your MPI job)
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+Succeeded! vertical pixels: 4289, horizontal pixels: 2835, num components: 1
+Allocating images...
+Done! Now dividing work among processes...
+Done! Sending out the picture...
+Done! Proceeding with converting...
+Done! Now starting denoising...
+Complete! Patching the picture back together
+slurmstepd: error: *** STEP 69695.0 ON c1-8 CANCELLED AT 2022-05-05T23:47:02 ***
+srun: error: c1-8: task 0: Exited with exit code 15
+srun: error: c1-8: tasks 1-7: Killed

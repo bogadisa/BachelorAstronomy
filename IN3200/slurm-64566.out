@@ -1,0 +1,145 @@
+[c1-5:3208172:0:3208172] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208173:0:3208173] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208174:0:3208174] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208175:0:3208175] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208177:0:3208177] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208176:0:3208176] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208178:0:3208178] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c1-5:3208179:0:3208179] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+==== backtrace (tid:3208177) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208177] *** Process received signal ***
+==== backtrace (tid:3208172) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208172] *** Process received signal ***
+[c1-5:3208172] Signal: Segmentation fault (11)
+[c1-5:3208172] Signal code:  (-6)
+[c1-5:3208172] Failing at address: 0x200c560030f3ec
+==== backtrace (tid:3208173) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208172] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x14b7970d1c20]
+[c1-5:3208173] *** Process received signal ***
+[c1-5:3208173] Signal: Segmentation fault (11)
+[c1-5:3208173] Signal code:  (-6)
+[c1-5:3208173] Failing at address: 0x200c560030f3ed
+[c1-5:3208172] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x14b798164d9b]
+[c1-5:3208172] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208173] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x15245e4fbc20]
+[c1-5:3208172] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x14b79814b493]
+[c1-5:3208172] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208172] *** End of error message ***
+[c1-5:3208173] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x15245f58ed9b]
+[c1-5:3208173] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208173] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x15245f575493]
+[c1-5:3208173] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208173] *** End of error message ***
+[c1-5:3208177] Signal: Segmentation fault (11)
+[c1-5:3208177] Signal code:  (-6)
+[c1-5:3208177] Failing at address: 0x200c560030f3f1
+==== backtrace (tid:3208179) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208179] *** Process received signal ***
+[c1-5:3208179] Signal: Segmentation fault (11)
+[c1-5:3208179] Signal code:  (-6)
+[c1-5:3208179] Failing at address: 0x200c560030f3f3
+[c1-5:3208179] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x14c38850ec20]
+[c1-5:3208179] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x14c3895a1d9b]
+[c1-5:3208179] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208179] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x14c389588493]
+[c1-5:3208179] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208179] *** End of error message ***
+[c1-5:3208177] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x151d5f09dc20]
+[c1-5:3208177] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x151d60130d9b]
+[c1-5:3208177] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208177] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x151d60117493]
+[c1-5:3208177] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208177] *** End of error message ***
+==== backtrace (tid:3208175) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+==== backtrace (tid:3208174) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208175] *** Process received signal ***
+[c1-5:3208175] Signal: Segmentation fault (11)
+[c1-5:3208175] Signal code:  (-6)
+[c1-5:3208175] Failing at address: 0x200c560030f3ef
+[c1-5:3208175] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x14bf0f28fc20]
+[c1-5:3208174] *** Process received signal ***
+[c1-5:3208174] Signal: Segmentation fault (11)
+[c1-5:3208174] Signal code:  (-6)
+[c1-5:3208174] Failing at address: 0x200c560030f3ee
+[c1-5:3208175] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x14bf10322d9b]
+[c1-5:3208175] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208174] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x14a1214c4c20]
+[c1-5:3208175] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x14bf10309493]
+[c1-5:3208175] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208175] *** End of error message ***
+[c1-5:3208174] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x14a122557d9b]
+[c1-5:3208174] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208174] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x14a12253e493]
+[c1-5:3208174] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208174] *** End of error message ***
+==== backtrace (tid:3208176) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208176] *** Process received signal ***
+[c1-5:3208176] Signal: Segmentation fault (11)
+[c1-5:3208176] Signal code:  (-6)
+[c1-5:3208176] Failing at address: 0x200c560030f3f0
+[c1-5:3208176] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x14f3bc734c20]
+[c1-5:3208176] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x14f3bd7c7d9b]
+[c1-5:3208176] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208176] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x14f3bd7ae493]
+[c1-5:3208176] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208176] *** End of error message ***
+==== backtrace (tid:3208178) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000003cd9b ____strtof_l_internal()  :0
+ 2 0x00000000004010f1 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040146e _start()  ???:0
+=================================
+[c1-5:3208178] *** Process received signal ***
+[c1-5:3208178] Signal: Segmentation fault (11)
+[c1-5:3208178] Signal code:  (-6)
+[c1-5:3208178] Failing at address: 0x200c560030f3f2
+[c1-5:3208178] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x152ace13cc20]
+[c1-5:3208178] [ 1] /lib64/libc.so.6(+0x3cd9b)[0x152acf1cfd9b]
+[c1-5:3208178] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4010f1]
+[c1-5:3208178] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x152acf1b6493]
+[c1-5:3208178] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40146e]
+[c1-5:3208178] *** End of error message ***
+srun: error: c1-5: tasks 0-7: Segmentation fault (core dumped)

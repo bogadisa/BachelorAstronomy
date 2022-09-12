@@ -1,0 +1,2 @@
+# Problem 6
+The tag for the `MPI_Bcast` and the other `MPI_Recv`s dont match and so the program will encounter a deadlock. Same goes later on when the send and recieve functions dont have matching tags.  

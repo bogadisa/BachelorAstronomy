@@ -1,0 +1,27 @@
+Succeeded! vertical pixels: 4289, horizontal pixels: 2835, num components: 1
+Allocating images...
+Done! Now dividing work among processes...
+Done! Sending out the picture...
+Done! Proceeding with converting...
+Done! Now starting denoising...
+Complete! Patching the picture back together
+Done! Converting back to jpeg format...
+[c1-8:2217656:0:2217656] Caught signal 11 (Segmentation fault: address not mapped to object at address 0x2c61)
+==== backtrace (tid:2217656) ====
+ 0 0x0000000000012c20 .annobin_sigaction.c()  sigaction.c:0
+ 1 0x000000000040189a convert_image_to_jpeg()  ???:0
+ 2 0x00000000004015d5 main()  ???:0
+ 3 0x0000000000023493 __libc_start_main()  ???:0
+ 4 0x000000000040169e _start()  ???:0
+=================================
+[c1-8:2217656] *** Process received signal ***
+[c1-8:2217656] Signal: Segmentation fault (11)
+[c1-8:2217656] Signal code:  (-6)
+[c1-8:2217656] Failing at address: 0x200c560021d6b8
+[c1-8:2217656] [ 0] /lib64/libpthread.so.0(+0x12c20)[0x151a9cf18c20]
+[c1-8:2217656] [ 1] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40189a]
+[c1-8:2217656] [ 2] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x4015d5]
+[c1-8:2217656] [ 3] /lib64/libc.so.6(__libc_start_main+0xf3)[0x151a9df92493]
+[c1-8:2217656] [ 4] /fp/homes01/u01/ec-bjornhod/Oblig 2/parallel_code/./parallel_main.exe[0x40169e]
+[c1-8:2217656] *** End of error message ***
+srun: error: c1-8: task 0: Segmentation fault (core dumped)
