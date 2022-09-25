@@ -10,7 +10,7 @@ def factorial(x):
 def omega(N, q):
     return factorial(N - 1 + q)/factorial(q)/factorial(N-1)
 
-
+#lar deg velge selv, enklere å eksprimentere
 q = int(input("q="))
 Na = int(input("Na="))
 Nb = int(input("Nb="))

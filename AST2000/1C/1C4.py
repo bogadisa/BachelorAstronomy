@@ -4,13 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import ast2000tools.utils as utils
+import time
 seed = utils.get_seed("bjornhod")
 
 
 data = []
-data.append(np.loadtxt("star0_5.99.txt")) ; data.append(np.loadtxt("star1_1.11.txt"))
-data.append(np.loadtxt("star2_1.63.txt")) ; data.append(np.loadtxt("star3_1.77.txt"))
-data.append(np.loadtxt("star4_3.20.txt"))
+data.append(np.loadtxt("star0_5_99.txt")) ; data.append(np.loadtxt("star1_1_11.txt"))
+data.append(np.loadtxt("star2_1_63.txt")) ; data.append(np.loadtxt("star3_1_77.txt"))
+data.append(np.loadtxt("star4_3_20.txt"))
 
 
 class DataExtractor:
@@ -275,6 +276,7 @@ class DataExtractor:
 
 
 if __name__ == "__main__":
+    initial_time = time.time()
     #seedet mitt slutter på 74
     seed74 = DataExtractor(data)
     seed74.GetHastigheterPlot(2)
@@ -331,3 +333,5 @@ if __name__ == "__main__":
     a_p = a_s * m_s / m_p
 
     print(f"Planeten har en halvakse {a_p=:g}")
+    final_time = time.time()
+    print(f"Programmet tok {final_time - initial_time} sekunder")
