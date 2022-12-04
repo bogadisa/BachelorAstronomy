@@ -280,9 +280,9 @@ if __name__ == "__main__":
     #seedet mitt slutter på 74
     seed74 = DataExtractor(data)
     seed74.GetHastigheterPlot(2)
-    #seed74.PlotHastighet()
+    seed74.PlotHastighet()
     seed74.GetLyskurvePlot(2)
-    #seed74.PlotLyskurve()
+    seed74.PlotLyskurve()
 
     n = 20
 
