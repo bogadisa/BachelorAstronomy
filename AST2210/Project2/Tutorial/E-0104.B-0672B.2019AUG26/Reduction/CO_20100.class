@@ -1,0 +1,332 @@
+! -----------------------------------------------------------------------------
+! Atacama Pathfinder Experiment - APEX
+! Class macro to reduce ON-OFF observations
+! -----------------------------------------------------------------------------
+! For documentation, examples and documentation about this routine, visit:
+! http://www.apex-telescope.org/twiki/bin/view/Main/GildasDataReductionTemplate
+! -----------------------------------------------------------------------------
+$clear
+on error pause
+
+set type line
+set plot histo
+set offset * *
+set format long
+set unit v f
+set align frequency composite
+set char 0.6
+set weight t ! for Time/(Tsys^2)
+
+las\set bad and
+las\set variable general read
+las\set variable calibration read
+las\set variable gauss read
+las\set variable base write
+sic\sic user
+
+define char SOURCE_NAME*30 LINE_FOR_FILENAME*30 MOLECULE*30 SCAN_START*10 SCAN_END*10 LINE_NAME*12
+define char MODE_X*10 MODE_Y*10 PROJECT_ID*30 PROJECT_PI*30 HR*100 BASENAME*100
+define char OUTPUT_SCI*40 OUTPUT_PDF*40 INFILE*100
+define double TON S2N TPEAK K
+define real BASE_WINDOW_FROM BASE_WINDOW_TO VLSR DELTA_VLSR LINE_FREQ
+define real MODE_X_FROM MODE_X_TO MODE_Y_FROM MODE_Y_TO NUMBE
+define integer BASE_DEGREE N_UTDATES NSB NLW LINEWIDTH LWIND KCHANMAX 
+define char SCIDATA*30 REDUCTION*30 REDUCED*30 PLOTS*30
+define real FLAG_EDGE FLAG_CENTER
+define int BCHAN ECHAN
+def char FE*6
+
+! Get PROJECT_ID from 'SYS_INFO'
+sic output tmp1.sed
+say 'SYS_INFO'
+sic output
+system "sed 's/\(.*\)/\U\1/' tmp1.sed | cut -d \@ -f 1 > tmp2.sed"
+accept PROJECT_ID /column tmp2.sed
+
+! Working input and output directories
+let SCIDATA = "~/scidata/"
+let REDUCTION = "~/Reduction/"
+let REDUCED = 'REDUCTION'"reduced/"
+let PLOTS = 'REDUCTION'"plots/"
+sic\sic mkdir 'REDUCED'
+sic\sic mkdir 'PLOTS'
+
+let KCHANMAX = 25
+let NUMBE = 2.0
+let K = 1.0644667068334197  ! (Area/Width)
+let HR = "----------------------------------------------------------------------------"
+
+! ---------------------------------------------------------------
+! -------------------> User Variables Input  <-------------------
+! ---------------------------------------------------------------
+
+! Project ID section
+let PROJECT_PI = "PI Name"
+
+! Defines array UTDATES of N_UTDATES dimension, to store a list of UT Dates (YYYY-MM-DD) 
+! of observations to reduce.
+! let UTDATES = YYYY-MM-DD YYYY-MM-DD YYYY-MM-DD (Space separated if N_UTDATES > 1)
+let N_UTDATES 2
+define character UTDATES*100[N_UTDATES]
+let UTDATES = 2019-08-26 2019-08-27 ! YYYY-MM-DD YYYY-MM-DD YYYY-MM-DD ... YYYY-MM-DD
+
+! Source to reduce
+let SOURCE_NAME = "20100"
+
+! MOLECULE is the line to reduce 
+let MOLECULE = "CO_20100"
+let LINE_NAME = "CO(2-1)"
+let LINE_FREQ = 221075.94
+
+! set mode X [km/s]
+!let MODE_X = "TOTAL"
+let MODE_X_FROM = -2758.613
+let MODE_X_TO = 2773.925
+
+! set mode Y [K]
+!let MODE_Y = "TOTAL"
+let MODE_Y_FROM = -0.013
+let MODE_Y_TO = 0.018
+
+! BASE_DEGREE is the baseline degree
+! LWIND is the number of line windows 
+! WIN is an array of LWIND dimensions which contains the velocity ranges in km/s
+! LINEWIDTH is the expected line width [km/s]
+! if LWIND = 0, calculates the line window automatically from VELOCITY and LINEWIDTH
+! If LWIND > 0, sets the line window values from the hardcoded values in the array WIN
+let BASE_DEGREE = 1
+let LWIND = 1
+
+if (LWIND.eq.0) then
+   let LINEWIDTH = 20 ! Expected line width [km/s]
+   define real WIN[3]
+   let WIN = 1 VELOCITY-LINEWIDTH/2 VELOCITY+LINEWIDTH/2
+else
+   define real WIN['LWIND*2+1']
+   let WIN = 'LWIND' -800 800
+endif
+
+! Define the smooth boxes. 
+! NSB is the number of smooth boxes and SB is the array of NSB 
+! dimensions listing the smooth boxes values.
+! If NSB = 0, then no smoothing will be applyied. 
+let NSB = 1
+if (NSB.ne.0) then
+   define int SB[NSB]
+   let SB = 280 ! 5 km/s
+endif
+
+! find /scan [first] [last]
+let SCAN_START = "*"
+let SCAN_END = "*"
+
+! Flag the first/last per cent of channels (edge/center of the band)
+! For PI230 FLAG_CENTER is set to 0.02 further down
+let FLAG_EDGE = 0.02
+let FLAG_CENTER = 0.04
+
+
+! ---------------------------------------------------------------
+! ----------------> End of User Variables Input  <---------------
+! ---------------------------------------------------------------
+sic output tmp1.sed
+say 'MOLECULE'
+sic output
+system "sed 's|[()-]||g' tmp1.sed > tmp2.sed"
+accept LINE_FOR_FILENAME /column tmp2.sed
+
+let BASENAME = 'SOURCE_NAME'"-"'LINE_FOR_FILENAME'
+let OUTPUT_SCI = 'REDUCED''BASENAME'".apex"
+let OUTPUT_PDF = 'PLOTS''BASENAME'".eps"
+
+if (MODE_X.eq."TOTAL") then
+   set mode x total
+else   
+   set mode x 'MODE_X_FROM' 'MODE_X_TO'
+endif
+   
+if (MODE_Y.eq."TOTAL") then
+   set mode y total
+else
+   set mode y 'MODE_Y_FROM' 'MODE_Y_TO'
+endif
+
+! set line window from WIN array 
+set window /var WIN
+
+file out 'REDUCED'"temp.apex" multiple /OVERWRITE
+
+! Loop each UTDATE array to read the corresponding scidata file
+for i 1 to N_UTDATES
+
+   let INFILE = 'SCIDATA''PROJECT_ID'"-"'UTDATES[i]'".apex"
+   file in 'INFILE'
+   
+   ! Use to ignore bad spectrum (if any)
+   ignore 
+
+   find /all /source 'SOURCE_NAME'* /line 'MOLECULE' /scan 'SCAN_START' 'SCAN_END'
+
+   if (found.gt.0) then
+      say 'HR'
+      say "Found "'FOUND'" Observations in file "'INFILE'
+      say 'HR'
+      get n
+      let FE 'telescope'
+      if (FE.eq."AP-P20") let FLAG_CENTER = 0.02 ! Can only flag 2% for PI230
+      get zero
+      for j 1 to FOUND
+         get n
+         if (tsys.ne.0) then
+            let BCHAN FLAG_EDGE*channels
+            let echan (1-FLAG_CENTER)*channels
+            let ry[1:BCHAN] -999
+            let ry[ECHAN:channels] -999
+            base BASE_DEGREE 
+            write
+         endif
+      next j
+   else
+      say 'HR'
+      say "Nothing found in file "'INFILE'
+      say 'HR'
+      if (i.eq.N_UTDATES) then
+         say ""
+         say "Nothing found in "'N_UTDATES'" input files"
+         say ""
+         return
+      endif         
+   endif
+next
+
+! Open the file with the previously reduced data
+file in 'REDUCED'"temp.apex"
+find /all
+
+! Average the observations list
+average /resample
+
+! Apply the defined smooth boxes (if any)
+if (NSB.ne.0) then
+   for i 1 to NSB
+      smooth box 'SB[i]'
+   next 
+endif
+
+! Apply the baseline 
+base BASE_DEGREE
+
+! Plot the reduced spectrum
+plot
+draw window
+
+! Gauss fit
+method gauss
+lines 0
+minimize
+
+let TON = int(1000*(TIME/60.0))/1000/NUMBE
+let TPEAK = ((nfit[1]/nfit[3])/K)*1000
+let S2N = TPEAK/(SIGMA*1000)
+
+say 'HR'
+say "Results for the Twiki project log:"
+if (S2N.gt.3.0) then
+   visualize      
+   say 'HR'
+   say "TimeON | TPeak | RMS mK| S2N"
+   say 'HR'
+   say 'TON' "|" 'TPEAK' "|" 'SIGMA*1000' "|" 'S2N' /format f6.1 a2 f6.1 a2 f6.1 a2 f6.1    
+   say 'HR'
+else
+   say 'HR'
+   say "TimeON | TPeak | RMS mK| S2N"
+   say 'HR'
+   say 'TON' " |   -   |" 'SIGMA*1000' " |  -" /format f6.1 a10 f6.1 a5
+   say 'HR'
+endif   
+
+! Some labels
+greg1\set label Y 4
+greg1\label "T\dA* (K)" /y
+pen 6
+draw molecule frequency 'line' 45 
+draw text 1.0 0.5 'PROJECT_ID'" ("'PROJECT_PI'")"
+draw text 20 0.5 "RMS "'NINT(SIGMA*10000)|10'" mK in Dv "'NINT(ABS(1000*VELO_STEP))|1000.'" km/s"
+pen /default
+
+! Save the reduction output
+hardcopy 'OUTPUT_PDF' /device eps fast /overwrite
+file out 'OUTPUT_SCI' multiple /OVERWRITE
+write
+
+say 'HR'
+say "RMS "'NINT(SIGMA*10000)|10'"mK in Dv "'nint(ABS(1000*velo_step))|1000.'" km/s"
+say ""
+
+let INFILE = 'SCIDATA''PROJECT_ID'"-"'UTDATES[N_UTDATES]'".apex"
+file in 'INFILE'
+find /all
+
+say 'SYS_INFO'
+
+! -----------------------------------------------------------------------------
+! Atacama Pathfinder Experiment - APEX
+! Class macro to reduce on-offs observations
+! -----------------------------------------------------------------------------
+! version who         when        what
+! ------- --------    ----------  ---------------------------------------------
+! 1.10    fmacauliffe 2006-05-01  Created
+! 1.20    fmacauliffe 2006-10-01  Added more functionalities
+! 1.30    fmacauliffe 2007-09-27  rms shown in mK.
+! 1.40    fmacauliffe 2007-09-30  Added some improvements suggested by ALU
+! 1.50    alundgre    2008-02-17  Modified the program to write the data to an 
+!                                 output file and add according to rms
+!         fmacauliffe 2008-04-10  Finish the script opening the input file and 
+!                                 find /all observations
+! 1.60    alundgre    2008-06-21  Modification of twiki line
+! 1.70    fmacauliffe 2008-10-24  Ignore the spectrum with tsys equals 0 K
+!                                 set plot histo
+! 1.80    fmacauliffe 2008-12-19  Save the final reduction to a class file
+!                                 rms shown with decimal format
+!                                 NUMBE set to 2 as default (Number of backends)
+! 1.90    fmacauliffe 2009-09-11  Added flag to set the class version in use 
+!                                 (i.e. Class77 or Class90). Depending on the 
+!                                 version, selects the right commands and syntax.
+! 1.91    fmontene    2014-10-05  Modifying syntax to make template compliant 
+!                                 with last version of CLASS (jun14a)
+! 2.00    fmacauliffe 2014-10-19  Only works with CLASS90 (Removed CLASS_VERSION)
+!                                 Removed set cursor (deprecated command)
+!                                 Removed some printouts like "Getting scan"'j'
+!                                 Removed optional fft 0.05 0.06 (not needed since 
+!                                 long time ago). Removed HARDCOPY and PRINTER
+!                                 Set align velocity composite is the default
+!         fmacauliffe 2014-12-11  New smooth box definition to add several boxes
+!                                 New set window defintion to add several line windows
+!                                 Added printout of user@host at the end of the macro
+!                                 Added a draw line command at the source VLSR
+! 2.01    fmacauliffe 2014-12-27  Added sic directory ~/scidata
+!                                 Removed offsets
+! 2.02    FMA/KTO     2015-01-23  Added Y-axis label TA* [K]
+!                                 set weigth t
+! 2.03    fmacauliffe 2015-01-24  The input files are defined only using the a list
+!                                 of UT dates. Code cleaning and optimization
+!         fmacauliffe 2015-04-06  PROJECT_ID is now automatically read using 'SYS_INFO'
+!                                 in combination with sed and cut processing
+!                                 LINE_FOR_FILENAME is automatically created using sed
+!                                 Working directories ~/Reduction/reduced and  ~/Reduction/plots
+!                                 are automatically created if the don't exist
+! 2.04    fmacauliffe 2015-04-19  Fixed a bug reported by FMO and fully described in the
+!                                 eGroupWare ticket #1711.
+!                                 Fixed a bug in line 175, which pointed to an non-definded 
+!                                 variable if observations are not found after the find command
+! 2.05    fmontene    2016-03-19  Removed "average /2010" which is not supported anymore by 
+!                                 GILDAS version 01Mar16. Replaced by "average /resample".
+! 2.06    ktorsten    2016-06-02  Changed from set align v c to set align f c to separate LSB
+!                                 from USB. Also changed the flagging loop of 25 channels to 
+!                                 instead do a vector opereration with 2% at band outer edge 
+!                                 and 4% in the overlap (2% for PI230). Replaced the apex 
+!                                 "cls" with $clear at start of script.
+! 2.07    ktorsten    2016-07-26  Select by frequency instead of line, changed to set win
+!                                 directly.
+! -----------------------------------------------------------------------------
