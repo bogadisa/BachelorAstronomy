@@ -1,0 +1,72 @@
+# PI230 Setup File for project E-0104.B-0672B-2019
+
+# Load special PI230 commands
+exec_apecs_script('pi230_commands')
+
+# Load PI230 observing functions:
+#execfile('/homes/software/apecs/start_pi230.apecs')
+execfile('/homes/software/apecs/startObsCommands.apecs')
+
+# User line catalog for PI230
+linecats('e-0104.b-0672b-2019.lin')
+
+# Setup for PI230 (frontend, backend, lines)
+# Uncomment the setup for the line to observe, or enter manually!
+# setup_pi230(linename='CO_F0050', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F0518', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_06035', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_06206', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_09022', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_PG112', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F1211', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F1434', sideband='', mode='spec', sbwidth=8, cats='user')
+#setup_pi230(linename='CO_16090', sideband='', mode='spec', sbwidth=8, cats='user')
+setup_pi230(linename='CO_20100', sideband='', mode='spec', sbwidth=8, cats='user')
+#setup_pi230(linename='CO_17208', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F1929', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_19542', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_20414', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F2055', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_PG213', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F2249', sideband='', mode='spec', sbwidth=8, cats='user')
+# setup_pi230(linename='CO_F2312', sideband='', mode='spec', sbwidth=8, cats='user')
+
+# User source catalog
+sourcecats(['e-0104.b-0672b-2019.cat'])
+
+# List of targets. Uncomment the one to observe, or enter manually!
+# source('F00509', cats='user')
+# source('F05189', cats='user')
+# source('06035', cats='user')
+# source('06206', cats='user')
+# source('08311', cats='user')
+# source('09022', cats='user')
+# source('10378', cats='user')
+# source('11095', cats='user')
+# source('PG1126', cats='user')
+# source('F12072', cats='user')
+# source('F12112', cats='user')
+# source('F13451', cats='user')
+# source('F14348', cats='user')
+# source('16090', cats='user')
+# source('17208', cats='user')
+# source('F19297', cats='user')
+# source('19542', cats='user')
+# source('20087', cats='user')
+source('20100', cats='user')
+# source('20414', cats='user')
+# source('F20551', cats='user')
+# source('PG2130', cats='user')
+# source('F22491', cats='user')
+# source('F23128', cats='user')
+# source('23230', cats='user')
+# source('23253', cats='user')
+
+# Wobbler switching. Put a dummy reference position, just in case...
+use_ref('on')
+reference(x=300.0, y=0.0, time=0.0, on2off=1, unit='arcsec', mode='rel', system='ho', epoch=2000.0)
+
+# Improved metrology settings:
+use_linear_sensors('on')
+use_tiltmeters('on')
+

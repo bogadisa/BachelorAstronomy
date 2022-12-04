@@ -83,4 +83,3 @@ for i, eta in enumerate(eta_vals):
 # print(Train_accuracy)
 #plotting
 plot_data(eta_vals, lmbd_vals, Train_accuracy, Type="Regression", title="sigmoid")
-plot_data(eta_vals, lmbd_vals, Test_accuracy, Type="Regression", title="sigmoid")

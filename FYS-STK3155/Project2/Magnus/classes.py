@@ -275,4 +275,5 @@ class NeuralNetwork:
 
     def get_MSEtest(self):
         arr_outEpochs = np.array(self.mseTest)
+
         return arr_outEpochs

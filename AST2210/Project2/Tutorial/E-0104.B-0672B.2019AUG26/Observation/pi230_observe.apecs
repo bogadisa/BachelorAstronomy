@@ -1,0 +1,22 @@
+# PI230 Observe File for project E-0104.B-0672B-2019
+
+# Wobbler switching mode. Setup:
+wob(amplitude=60, rate=0.5, mode='sym', blank=-1)
+
+# Offsets
+offset(x=0.0, y=0.0, unit='arcsec', system='EQ', epoch=2000.0)
+
+# Observing mode: On (Wobbler switching)
+# PI comment: 
+
+for i in xrange(10): # adjust to observing needs...
+    print ' '; print 'Loop #:',i+1,'starting...'; print ' '
+    wob()
+    calibrate('cold')
+    repeat(10)     # adjust to observing needs...
+    on(time=20)
+tp()
+
+# Further instructions for the observer:
+# Please note that the requested sensitivities and corresponding channel widths vary from source to source. The goal sensitivity (and the channel widths) are annotated in the comments in the .cat file for each source (after "!"). Please observe with PWV<=3mm. Time estimates performed assuming PWV=2mm.
+
