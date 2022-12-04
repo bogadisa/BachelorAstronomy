@@ -144,4 +144,5 @@ def to_categorical_numpy(integer_vector):
     onehot_vector = np.zeros((n_inputs, n_categories))
     onehot_vector[range(n_inputs), integer_vector] = 1
     
+
     return onehot_vector

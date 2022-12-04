@@ -556,4 +556,4 @@ x = np.linspace(-1, 1, n)
 def f(x):
     return 1+ 5*x - 3*x**2 
 
-y = f(x)"""
+y = f(x)

@@ -25,4 +25,3 @@ c_gas = np.zeros(n)
 f_gas = np.zeros(n)
 for i, gas in enumerate(gases):
     T_mean_gas = np.mean(T(Rt[i]))
-    
