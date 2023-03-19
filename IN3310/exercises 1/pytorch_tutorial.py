@@ -13,3 +13,5 @@ a = torch.full((2, 3), 3)
 y = torch.ones((2, 5, 10))
 
 print(torch.add(x, y).shape)
+print(torch.add(x, y))
+# print(x.size())
