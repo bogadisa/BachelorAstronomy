@@ -1,3 +1,6 @@
+"""
+The majority of this code has been taken from the solution to exercise 5. I have then modified and implimented new features.
+"""
 from __future__ import print_function, division
 
 import torch
@@ -27,7 +30,7 @@ seed = 1234
 torch.manual_seed(seed)
 
 class environmentClass(Dataset):
-    def __init__(self, root_dir, trvaltest, transform=None):
+    def __init__(self, root_dir, output_dir, trvaltest, transform=None):
         self.root_dir = root_dir
 
         self.transform = transform
@@ -48,7 +51,7 @@ class environmentClass(Dataset):
         else:
             raise Exception(f"Expected trvaltest value between [0, 2], got {trvaltest}")
 
-        path = os.path.join(root_dir, data_type)
+        path = os.path.join(output_dir, data_type)
         with open(path) as f:
             lines = f.readlines()
             for line in lines:
@@ -82,13 +85,15 @@ class environmentClass(Dataset):
 
 def runstuff_finetunealllayers():
     #someparameters
-    batchsize_tr = 32
+    batchsize_tr = 16
     batchsize_test = 16
     maxnumepochs = 5
     numcl = 6
 
     # device=torch.device('cuda')
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device)
+    # quit()
 
     data_transforms = {}
     data_transforms['train']=transforms.Compose([
@@ -108,9 +113,9 @@ def runstuff_finetunealllayers():
 
 
     datasets = {}
-    datasets['train'] = environmentClass(root_dir=img_dir, trvaltest=0, transform=data_transforms['train'])  
-    datasets['val'] = environmentClass(root_dir=img_dir, trvaltest=1, transform=data_transforms['val'])
-    datasets['test'] = environmentClass(root_dir=img_dir, trvaltest=2, transform=data_transforms['val'])
+    datasets['train'] = environmentClass(root_dir=img_dir, output_dir=output_dir, trvaltest=0, transform=data_transforms['train'])  
+    datasets['val'] = environmentClass(root_dir=img_dir, output_dir=output_dir, trvaltest=1, transform=data_transforms['val'])
+    datasets['test'] = environmentClass(root_dir=img_dir, output_dir=output_dir, trvaltest=2, transform=data_transforms['val'])
 
 
     dataloaders = {}
@@ -153,27 +158,64 @@ def runstuff_finetunealllayers():
 
     model.load_state_dict(weights_chosen)
 
-    # fig_name = f"model_lr{optimizer.param_groups[0]['lr']:.0E}.png"
+    #saves a plot of the training and validation loss of the best chosen model
     fig_name = f"model_lr{best_hyperparameter:.0E}.png"
-    fig.savefig(os.path.join(img_dir, fig_name))
+    best_fig.suptitle(rf"Model with learning rate $\lambda={best_hyperparameter}$")
+    best_fig.savefig(os.path.join(output_dir, fig_name))
 
 
     accuracy, testloss = evaluate_acc(model = model , dataloader  = dataloaders['test'], losscriterion = criterion, device = device, classifications=classification, testing=True)
-    torch.save(model, os.path.join(img_dir, "final_model.pt"))
+    #saves the best model
+    torch.save(model, os.path.join(output_dir, "final_model.pt"))
 
     print('accuracy val', bestmeasure, 'accuracy test', accuracy)
 
+def runstuff():
+    batchsize_test = 16
+
+    criterion = torch.nn.CrossEntropyLoss(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = torch.load(os.path.join(output_dir, "final_model.pt"), map_location=device)
+    
+    data_transforms = {}
+    data_transforms['val']=transforms.Compose([
+            transforms.Resize(224),
+            transforms.CenterCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
+    datasets = {}
+    datasets['test'] = environmentClass(root_dir=img_dir, output_dir=output_dir, trvaltest=2, transform=data_transforms['val'])
+    dataloaders = {}
+    dataloaders['test']= DataLoader(datasets['test'], batch_size=batchsize_test, shuffle=False)  
+    
+
+    accuracy, testloss = evaluate_acc(model = model , dataloader  = dataloaders['test'], losscriterion = criterion, device = device, classifications=classification, testing=True)
+    
+    print('accuracy test', accuracy)
 
 root_dir = os.path.normpath("/".join(__file__.split("\\")[:-1]))
-img_dir = os.path.join(root_dir, "mandatory1_data")
+#Whenever I run the code on my computer, I dont have a GPU
+#So if there is a GPU, it means I can assume we are running the file on one of the nodes
+if torch.cuda.is_available():
+    img_dir = "/itf-fi-ml/shared/courses/IN3310/mandatory1_data"
+else:
+    img_dir = os.path.join(root_dir, "mandatory1_data")
     
 if __name__ == "__main__":
     #generates a txt file with all image names and their classification
     #format: img_nr.jpg, classification
 
     data_filename = "all.txt"
-    data_path = os.path.join(img_dir,data_filename)
-    classification = classify(img_dir)
+    output_dir = os.path.join(root_dir, "output_folder")
+    data_path = os.path.join(output_dir, data_filename)
+
+    if not(os.path.isdir(output_dir)):
+        os.mkdir(output_dir)
+
+    classification = classify(img_dir, output_dir)
 
     data = np.loadtxt(data_path, dtype=str)
 
@@ -186,10 +228,11 @@ if __name__ == "__main__":
     #format: img_nr.jpg, classification
 
     # if not(os.path.isfile(os.path.join(img_dir, "train.txt"))):
-    split_txt(img_dir, "trainfile.txt", X_train, y_train)
+    split_txt(img_dir, output_dir, "trainfile.txt", X_train, y_train)
     # if not(os.path.isfile(os.path.join(img_dir, "testfile.txt"))):
-    split_txt(img_dir, "testfile.txt", X_test, y_test)
+    split_txt(img_dir, output_dir, "testfile.txt", X_test, y_test)
     # if not(os.path.isfile(os.path.join(img_dir, "valfile.txt"))):
-    split_txt(img_dir, "valfile.txt", X_val, y_val)
+    split_txt(img_dir, output_dir, "valfile.txt", X_val, y_val)
 
-    runstuff_finetunealllayers()
+    # runstuff_finetunealllayers()
+    runstuff()

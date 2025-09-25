@@ -257,3 +257,13 @@ poetry.toml
 # End of https://www.toptal.com/developers/gitignore/api/python,c,c++,jupyternotebooks
 
 *.jpg
+*.pt
+*.pas
+
+.history/
+
+# Too big files
+IN3310/oblig2/student_version/pycocoevalcap/meteor/data/paraphrase-en.gz
+IN3310/oblig2/student_version/best_epoch19.pt
+IN3310/oblig2/student_version/student_version/storedModels_test/model_3/best_epoch40.pt
+IN3310/oblig2/student_version/student_version/storedModels_test/model_3/last_epoch48.pt

@@ -50,3 +50,12 @@ Anything and everything related to bachelor degree in astronomy
 ](https://www.uio.no/studier/emner/matnat/astro/AST2210/index.html)
 - [FYS-STK3155 – Anvendt dataanalyse og maskinlæring
 ](https://www.uio.no/studier/emner/matnat/fys/FYS-STK3155/index.html)
+
+### 6th semester
+- [AST3220 – Kosmologi I
+](https://www.uio.no/studier/emner/matnat/astro/AST3220/)
+- [AST3310 – Astrofysiske plasma og stjernenes indre
+](https://www.uio.no/studier/emner/matnat/astro/AST3310/)
+- [Studies Courses
+IN3310 – Deep Learning for Image Analysis
+](https://www.uio.no/studier/emner/matnat/ifi/IN3310/)
