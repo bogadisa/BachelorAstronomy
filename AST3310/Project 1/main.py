@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from functions import *
 from variables import *
+import pandas as pd
 
 
 if __name__ == "__main__":
@@ -100,7 +101,7 @@ if __name__ == "__main__":
         #repeat
         r_reaction_rates["PP2"][1] = np.where(r_reaction_rates["PP0"][0] <= 2*r_reaction_rates["PP1"][1] + r_reaction_rates["PP2"][1], r_reaction_rates["PP0"][0]*(r_reaction_rates["PP2"][1]/(2*r_reaction_rates["PP1"][1] + r_reaction_rates["PP2"][1])), r_reaction_rates["PP2"][1]) 
         r_reaction_rates["PP3"][1] = r_reaction_rates["PP2"][1]
-        r_reaction_rates["PP2"][2] = np.where(r_reaction_rates["PP2"][1] <= r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2], r_reaction_rates["PP2"][1]*(r_reaction_rates["PP2"][2]/(r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2])), r_reaction_rates["PP2"][2])
+        r_reaction_rates["PP2"][2] = np.where(r_reaction_rates["PP2"][1] <= r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2], 4*r_reaction_rates["PP2"][1]*(r_reaction_rates["PP2"][2]/(r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2])), r_reaction_rates["PP2"][2])
         r_reaction_rates["PP2"][3] = np.where(r_reaction_rates["PP2"][2] <= r_reaction_rates["PP2"][3], r_reaction_rates["PP2"][2], r_reaction_rates["PP2"][3])
 
         r_reaction_rates["PP3"][2] = np.where(r_reaction_rates["PP3"][1] <= r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2], r_reaction_rates["PP3"][1]*(r_reaction_rates["PP3"][2]/(r_reaction_rates["PP2"][2] + r_reaction_rates["PP3"][2])), r_reaction_rates["PP3"][1])
@@ -136,8 +137,14 @@ if __name__ == "__main__":
                 total_production += branch_production[key]
 
         #divide by total to get a relative energy production
+
+        data_branch_production = {"logT" : np.log10(T)}
         for key in branch_production:
+            data_branch_production[key] = branch_production[key]/total_production
             plt.plot(T, branch_production[key]/total_production, label=key)
+
+        df = pd.DataFrame(data=data_branch_production)
+        df.to_csv(f"epsilon_branch.txt", sep=" ", index=False)
 
         #add a line for the temperature of the sun
         plt.axvline(x = 1.57e7, color="black", linestyle="--")

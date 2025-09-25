@@ -4,12 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from sklearn.metrics import confusion_matrix, average_precision_score
-from torchmetrics import AveragePrecision
+# from torchmetrics import AveragePrecision
 
-def classify(root_dir):
+def classify(root_dir, output_dir):
+    #gets the name of the classification from the name of the different directories
     classification = [name for name in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, name))]
 
-    with open(root_dir+"/all.txt", "w") as f:
+    with open(os.path.join(output_dir, "all.txt"), "w") as f:
         for dir_ in os.listdir(root_dir):
             if os.path.isdir(os.path.join(root_dir, dir_)):
                 i = 0
@@ -22,14 +23,14 @@ def classify(root_dir):
 
     return classification
 
-def split_txt(root_dir, function, X, y):
+def split_txt(root_dir, output_dir, function, X, y):
     i = 0
-    with open(os.path.join(root_dir, function), "w") as f:
+    with open(os.path.join(output_dir, function), "w") as f:
         for X_, y_ in zip(X, y):
             f.write(f"{X_} {y_}\n")
             i += 1
-            if i > 100:
-                break
+            # if i > 100:
+            #     break
 
 def train_epoch(model,  trainloader,  losscriterion, device, optimizer, classifications, selected_modules):
 
@@ -39,13 +40,8 @@ def train_epoch(model,  trainloader,  losscriterion, device, optimizer, classifi
     matrix = torch.zeros(len(classifications), len(classifications))
     for batch_idx, data in enumerate(trainloader):
 
-        # print(data["image"], "\n", data["label"])
         inputs  = data['image'].to(device)
         labels  = data['label'].to(device)
-        
-        # for nam, mod in model.named_modules():
-        #     if nam in selected_modules:
-        #         mod.batchindex = batch_idx
 
         optimizer.zero_grad()
 
@@ -66,10 +62,10 @@ def train_epoch(model,  trainloader,  losscriterion, device, optimizer, classifi
         #for small sample sizes, certain classes do not appear in neither preds or labels
         #this handles that exeption
         try:
-            temp_matrix = confusion_matrix(labels.data, preds)
+            temp_matrix = confusion_matrix(data["label"], preds)
             matrix += temp_matrix
         except ValueError:
-            temp_data = torch.clone(labels.data)
+            temp_data = torch.clone(data["label"])
             temp_preds = torch.clone(preds)
             for i in range(matrix.shape[0]):
                 temp_data = torch.tensor(temp_data.tolist()+ [i])
@@ -122,10 +118,10 @@ def evaluate_acc(model, dataloader, losscriterion, device, classifications, test
             #for small sample sizes, certain classes do not appear in neither preds or labels
             #this handles that exeption
             try:
-                temp_matrix = confusion_matrix(labels.data, preds)
+                temp_matrix = confusion_matrix(data["label"], preds)
                 matrix += temp_matrix
             except ValueError:
-                temp_data = torch.clone(labels.data)
+                temp_data = torch.clone(data["label"])
                 temp_preds = torch.clone(preds)
                 for i in range(matrix.shape[0]):
                     temp_data = torch.tensor(temp_data.tolist()+ [i])
@@ -136,9 +132,10 @@ def evaluate_acc(model, dataloader, losscriterion, device, classifications, test
                 matrix += temp_matrix
 
             if testing:
+                #softmax scores and the images they were computed on
                 all_outputs.append(cpuout)
                 all_filenames.append(data['filename'])
-                all_labels += data["label"].tolist()
+                all_labels += torch.clone(data["label"]).tolist()
 
     
 
@@ -147,10 +144,14 @@ def evaluate_acc(model, dataloader, losscriterion, device, classifications, test
             print(f"    {classifications[i]}, {acc}")
         print()
 
+        #certain stats are only needed for testing
         if testing:
             all_outputs = torch.tensor(torch.cat(all_outputs))
             all_outputs_array = torch.clone(all_outputs).numpy()
-            flat_filenames = [filename.split("\\")[-1] for sublist in all_filenames for filename in sublist]
+            if "\\" in all_filenames[0][0]:
+                flat_filenames = [filename.split("\\")[-1] for sublist in all_filenames for filename in sublist]
+            else:
+                flat_filenames = [filename.split("/")[-1] for sublist in all_filenames for filename in sublist]
             for i in range(3):
                 sorted_outputs = np.sort(all_outputs_array[:, i])
                 args_sorted = np.argsort(all_outputs_array[:, i]).tolist()
@@ -164,15 +165,24 @@ def evaluate_acc(model, dataloader, losscriterion, device, classifications, test
                 print("    Bottom 10:")
                 print("    ", bottom10)
 
+            #calculates the AP
             all_labels = torch.tensor(all_labels)
-            average_precision = AveragePrecision(task="multiclass", num_classes=len(classifications), average=None)
-            average_precision_classes = average_precision(all_outputs, all_labels)
+            average_precision_classes = []
+            for i in range(len(classifications)):
+                i_label = torch.where(all_labels == i, 1, 0)
+                i_outputs = all_outputs[:, i]
+                average_precision_classes.append(average_precision_score(i_label, i_outputs))
+
+            #had to change to using sklearn because torchmetrics wasnt installed on ml nodes
+            # average_precision = AveragePrecision(task="multiclass", num_classes=len(classifications), average=None)
+            # average_precision_classes = average_precision(all_outputs, all_labels)
             print("Average precision: ")
             for classification, AP in zip(classifications, average_precision_classes):
                 print("    ", classification, ": ", AP.item())
 
     return accuracy.item() , np.mean(losses)
 
+#the hook, it only gathers the first 200 images
 def hook_relu(nam, feature_map_tracker):
     def fn(m, i, o):
         if len(feature_map_tracker[nam]) < 200:
@@ -184,6 +194,8 @@ def train_model_nocv_sizes(dataloader_train, dataloader_test ,  model ,  losscri
     i = 1
     selected_modules = []
     hook_handles = []
+    #registers the hooks on the chosen modules
+    #there are only 4 layers in chosen pretrained network, so I choose a fifth one too
     for nam, mod in model.named_modules():
         if nam == f"layer{i}.1.relu":
             selected_modules.append([nam, mod])
@@ -200,6 +212,7 @@ def train_model_nocv_sizes(dataloader_train, dataloader_test ,  model ,  losscri
     best_measure = 0
     best_epoch =-1
 
+    #we want to track the loss for each epoch
     train_loss = []
     val_loss = []
     for epoch in range(num_epochs):
@@ -226,9 +239,10 @@ def train_model_nocv_sizes(dataloader_train, dataloader_test ,  model ,  losscri
 
         print()
 
+    #Uses the information found through the hooks
+    #calculates the percentage of non-positive elements
     feature_stats = []
     for nam in feature_map_tracker:
-        print(len(feature_map_tracker[nam]))
         num_elements = 0
         non_positive = 0
         for output in feature_map_tracker[nam]:
@@ -236,9 +250,12 @@ def train_model_nocv_sizes(dataloader_train, dataloader_test ,  model ,  losscri
             num_elements += torch.numel(output)
         feature_stats.append(non_positive/num_elements)
 
+    #create a plot of the train and validation loss
     fig = plt.figure()
     plt.plot(train_loss, label="train_loss", linestyle="solid", color="black")
     plt.plot(val_loss, label="val_loss", linestyle="dashed", color="black")
+    plt.xlabel("Epoch")
+    plt.ylabel("loss")
     plt.legend()
         
 
@@ -247,6 +264,7 @@ def train_model_nocv_sizes(dataloader_train, dataloader_test ,  model ,  losscri
         print(f"    {nam} = {stat.item()}")
     print()
 
+    #removes handles so that the model can be pickled
     for handle in hook_handles:
         handle.remove()
 
